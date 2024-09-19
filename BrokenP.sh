@@ -11,17 +11,37 @@ check_url() {
     echo "$http_code"
 }
 
-# Check if the URL is provided
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <URL>"
+# Function to check URLs from a file
+check_urls_from_file() {
+    local file=$1
+
+    while IFS= read -r url; do
+        if [ -n "$url" ]; then
+            status_code=$(check_url "$url")
+            if [ "$status_code" -ge 200 ] && [ "$status_code" -lt 400 ]; then
+                echo "URL $url is reachable (HTTP status code: $status_code)"
+            else
+                echo "URL $url is not reachable (HTTP status code: $status_code)"
+            fi
+        fi
+    done < "$file"
+}
+
+# Check if at least one argument is provided
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <URL|subdomains_file>"
     exit 1
 fi
 
-url=$1
-status_code=$(check_url "$url")
-
-if [ "$status_code" -ge 200 ] && [ "$status_code" -lt 400 ]; then
-    echo "URL $url is reachable (HTTP status code: $status_code)"
+# Check if the argument is a file or a single URL
+if [ -f "$1" ]; then
+    check_urls_from_file "$1"
 else
-    echo "URL $url is not reachable (HTTP status code: $status_code)"
+    url=$1
+    status_code=$(check_url "$url")
+    if [ "$status_code" -ge 200 ] && [ "$status_code" -lt 400 ]; then
+        echo "URL $url is reachable (HTTP status code: $status_code)"
+    else
+        echo "URL $url is not reachable (HTTP status code: $status_code)"
+    fi
 fi
