@@ -44,3 +44,8 @@ This script checks if a given URL or URLs listed in a file are reachable or not 
 ```bash
 $ ./broken_link_detector.sh http://example.com
 URL http://example.com is reachable (HTTP status code: 200)
+
+$ ./broken_link_detector.sh subdomains.txt
+URL http://example.com is reachable (HTTP status code: 200)
+URL http://nonexistenturl.example is not reachable (HTTP status code: 404)
+
